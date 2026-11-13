@@ -60,7 +60,7 @@ class CalculoInconsistenteError(SoftwareFJError):
     pass
 
 
-# ============================================================
+# Aporte Ronal Camaño=========================================
 # 3. CLASE ABSTRACTA BASE (Abstracción)
 # ============================================================
 class EntidadBase(abc.ABC):
