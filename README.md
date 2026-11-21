@@ -70,3 +70,30 @@ class Cliente(EntidadBase):
 
     def obtener_resumen(self) -> str:
         return f"Cliente [{self.id_entidad}]: {self.nombre} ({self.email})"
+
+# Segundo aporte de Ronal Camaño==============================
+# 7. GESTOR DEL SISTEMA (Listas en memoria)
+# ============================================================
+class SistemaGestion:
+    """
+    Administra las listas de clientes, servicios y reservas.
+    No usa base de datos, todo está en memoria.
+    """
+    def __init__(self):
+        self.clientes = []
+        self.servicios = []
+        self.reservas = []
+
+    def registrar_cliente(self, cliente: Cliente):
+        self.clientes.append(cliente)
+        logger.info(f"Cliente registrado: {cliente.obtener_resumen()}")
+
+    def registrar_servicio(self, servicio: Servicio):
+        self.servicios.append(servicio)
+        logger.info(f"Servicio registrado: {servicio.obtener_resumen()}")
+
+    def crear_reserva(self, id_reserva: str, cliente: Cliente, servicio: Servicio, duracion: float) -> Reserva:
+        reserva = Reserva(id_reserva, cliente, servicio, duracion)
+        self.reservas.append(reserva)
+        logger.info(f"Reserva creada: {id_reserva} para cliente {cliente.nombre}")
+        return reserva
