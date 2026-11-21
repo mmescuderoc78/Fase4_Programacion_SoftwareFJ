@@ -341,3 +341,114 @@ class SistemaGestion:
         self.reservas.append(reserva)
         logger.info(f"Reserva creada: {id_reserva} para cliente {cliente.nombre}")
         return reserva
+
+# ========apote mnauel escudero====================================
+# 8. SIMULACIÓN DE 10 OPERACIONES
+# ============================================================
+sistema = SistemaGestion()
+
+print("\n--- SIMULACIÓN DE OPERACIONES EN SOFTWARE FJ ---\n")
+
+def ejecutar_operacion(numero_op: str, descripcion: str, funcion_op):
+    """
+    Función auxiliar que ejecuta cada operación de forma segura.
+    Captura cualquier error para que el programa NUNCA se detenga.
+    """
+    print(f"Op #{numero_op}: {descripcion}")
+    try:
+        funcion_op()
+    except Exception as error:
+        print(f"  ✗ ERROR (Controlado): {error}")
+        logger.warning(f"Excepción atrapada en Op #{numero_op}: {error}")
+    else:
+        print(f"  ✓ Operación #{numero_op} finalizada correctamente.")
+    finally:
+        print("-" * 60)
+
+
+# ---------- Operación 1 (VÁLIDA) ----------
+def op1():
+    c1 = Cliente("C01", "Carlos Mendoza", "carlos@mail.com", "3001234567")
+    sistema.registrar_cliente(c1)
+ejecutar_operacion("1", "Registro de Cliente válido (Carlos Mendoza)", op1)
+
+# ---------- Operación 2 (INVÁLIDA) ----------
+def op2():
+    # Email sin @ → debe fallar
+    c_bad = Cliente("C02", "Ana Gómez", "correo_invalido_sin_arroba", "3119876543")
+    sistema.registrar_cliente(c_bad)
+ejecutar_operacion("2", "Registro de Cliente con Email incorrecto", op2)
+
+# ---------- Operación 3 (VÁLIDA) ----------
+def op3():
+    s1 = ReservaSala("S01", capacidad_personas=20, incluye_proyector=True, tarifa_base=60.0)
+    sistema.registrar_servicio(s1)
+ejecutar_operacion("3", "Creación de Servicio de Sala válido", op3)
+
+# ---------- Operación 4 (INVÁLIDA) ----------
+def op4():
+    # Capacidad negativa → debe fallar
+    s_bad = ReservaSala("S02", capacidad_personas=-5, incluye_proyector=False)
+    sistema.registrar_servicio(s_bad)
+ejecutar_operacion("4", "Creación de Sala con capacidad negativa", op4)
+
+# ---------- Operación 5 (VÁLIDA) ----------
+def op5():
+    s2 = AsesoriaEspecializada("S03", especialista="Ing. Laura Pérez", nivel_experiencia="Senior", tarifa_base=120.0)
+    sistema.registrar_servicio(s2)
+ejecutar_operacion("5", "Creación de Asesoría Senior válida", op5)
+
+# ---------- Operación 6 (INVÁLIDA) ----------
+def op6():
+    # Nivel de experiencia inválido → debe fallar
+    s_bad = AsesoriaEspecializada("S04", especialista="Pedro", nivel_experiencia="Principiante")
+    sistema.registrar_servicio(s_bad)
+ejecutar_operacion("6", "Creación de Asesoría con nivel inválido", op6)
+
+# ---------- Operación 7 (VÁLIDA) ----------
+def op7():
+    # CORREGIDO: se toman los objetos de las listas, no las listas enteras
+    cliente = sistema.clientes[0]
+    servicio = sistema.servicios[0]
+    reserva1 = sistema.crear_reserva("R01", cliente, servicio, duracion=4.0)
+    reserva1.confirmar()
+    reserva1.procesar()
+ejecutar_operacion("7", "Creación, confirmación y procesamiento de Reserva válida", op7)
+
+# ---------- Operación 8 (INVÁLIDA) ----------
+def op8():
+    cliente = sistema.clientes[0]
+    servicio = sistema.servicios[0]
+    # Duración 0 → debe fallar al confirmar
+    reserva_bad = sistema.crear_reserva("R02", cliente, servicio, duracion=0.0)
+    reserva_bad.confirmar()
+ejecutar_operacion("8", "Confirmación de Reserva con duración 0 horas", op8)
+
+# ---------- Operación 9 (INVÁLIDA) ----------
+def op9():
+    cliente = sistema.clientes[0]
+    servicio = sistema.servicios[1]   # Asesoría
+    reserva_sin_confirmar = sistema.crear_reserva("R03", cliente, servicio, duracion=2.0)
+    # Intentamos procesar sin confirmar → debe fallar
+    reserva_sin_confirmar.procesar()
+ejecutar_operacion("9", "Procesar Reserva en estado 'Pendiente'", op9)
+
+# ---------- Operación 10 (VÁLIDA) ----------
+def op10():
+    cliente = sistema.clientes[0]
+    s3 = AlquilerEquipo("S05", tipo_equipo="Servidor Dell PowerEdge", seguro_deposito=150.0, tarifa_base=40.0)
+    sistema.registrar_servicio(s3)
+    reserva_canc = sistema.crear_reserva("R04", cliente, s3, duracion=5.0)
+    reserva_canc.cancelar()
+ejecutar_operacion("10", "Creación de Alquiler de Equipo y Cancelación de Reserva", op10)
+
+
+# ============================================================
+# FIN DE LA SIMULACIÓN
+# ============================================================
+print("\n=== SIMULACIÓN FINALIZADA DE FORMA ESTABLE Y CONTINUA ===")
+print("Consulte el archivo 'app.log' para ver el historial completo de logs.")
+print(f"\nResumen final:")
+print(f"  Clientes registrados  : {len(sistema.clientes)}")
+print(f"  Servicios registrados : {len(sistema.servicios)}")
+print(f"  Reservas creadas      : {len(sistema.reservas)}")
